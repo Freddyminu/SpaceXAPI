@@ -12,7 +12,7 @@ import ObjectsToCsv from 'objects-to-csv'
   The query used with the spacex API, it takes all the ships
   with their respective names, missions and active status.
 */
-const query = gql`
+const QUERY = gql`
   {
     launchesPast {
       ships {
@@ -25,27 +25,24 @@ const query = gql`
 `
 
 // The SpaceX API endpoint
-const apiEndpoint = 'https://api.spacex.land/graphql/'
+const API_ENDPOINT = 'https://api.spacex.land/graphql/'
 
 // Function used to produce a csv file containing all active ships
 async function getSpacexShipsCsv () {
   const shipArray = []
-  const missionArray = []
 
   // The request made to the SpaceX API endpoint.
-  const data = await request(apiEndpoint, query)
+  const data = await request(API_ENDPOINT, QUERY)
   // Interating each mission in the request.
   for (const mission of data.launchesPast) {
     // Only using missions with ships in them.
     if (mission.ships.length > 0) {
-      // Saving the mission name for later.
-      missionArray[mission] = mission.mission_name
       // Interating each ship in the mission.
       for (const ship of mission.ships) {
         // Only using ships with names and that are active.
         if (ship?.name.length > 0 && ship.active === true) {
           const shipData = {}
-          shipData.Mission_Name = missionArray[mission]
+          shipData.Mission_Name = mission.mission_name
           shipData.Ship_Name = ship.name
           shipArray.push(shipData)
         }
